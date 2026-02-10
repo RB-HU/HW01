@@ -206,6 +206,7 @@ bool LLIterator_Remove(LLIterator *iter,
   }
   LinkedListNode *to_remove = iter->node;
   LinkedList *list = iter->list;
+  LinkedListNode *next_node = to_remove->next;
   if (payload_free_function != nullptr) {
     payload_free_function(to_remove->payload);
   }
@@ -216,17 +217,13 @@ bool LLIterator_Remove(LLIterator *iter,
   }
   if (to_remove->next != nullptr) {
     to_remove->next->prev = to_remove->prev;
-    iter->node = to_remove->next;
   } else {
     list->tail = to_remove->prev;
-    if (to_remove->prev != nullptr) {
-      to_remove->prev->next = nullptr;
-    }
-    iter->node = to_remove->prev;
   }
   delete to_remove;
   list->num_elements--;
-  return true;
+  iter->node = next_node;
+  return (next_node != nullptr);
   // you may need to change this return value
 }
 
