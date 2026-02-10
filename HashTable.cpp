@@ -115,8 +115,47 @@ bool HashTable_Insert(HashTable* table,
   // and optionally remove a key within a chain, rather than putting
   // all that logic inside here.  You might also find that your helper
   // can be reused in steps 2 and 3.
-
-  return false;  // you may need to change this return value
+  bool found=false;
+  HTKeyValue_t* found_kv=nullptr;
+  LLIterator* chain_iter=LLIterator_New(chain);
+  while (LLIterator_IsValid(chain_iter)) {
+    HTKeyValue_t* curr_kv;
+    LLIterator_Get(chain_iter, reinterpret_cast<LLPayload_t*>(&curr_kv));
+    
+    if (curr_kv->hash == newkeyvalue.hash && 
+        table->key_cmp_fn(curr_kv->key, newkeyvalue.key)) {
+      found = true;
+      found_kv = curr_kv;
+      break;
+    }
+    LLIterator_Next(chain_iter);
+  }
+  LLIterator_Delete(chain_iter);
+  if (found) {
+    *oldkeyvalue = *found_kv;
+    HTKeyValue_t* kv_copy=new HTKeyValue_t;
+    *kv_copy = newkeyvalue;
+    LLIterator* replace_iter = LLIterator_New(chain);
+    while (LLIterator_IsValid(replace_iter)) {
+      HTKeyValue_t* curr_kv;
+      LLIterator_Get(replace_iter, reinterpret_cast<LLPayload_t*>(&curr_kv));
+      if (curr_kv==found_kv) {
+        LLIterator_Remove(replace_iter,nullptr);
+        LinkedList_Append(chain, reinterpret_cast<LLPayload_t>(kv_copy));
+        break;
+      }
+      LLIterator_Next(replace_iter);
+    }
+    LLIterator_Delete(replace_iter);
+    return true;
+  } 
+  else {
+    HTKeyValue_t* kv_copy=new HTKeyValue_t;
+    *kv_copy=newkeyvalue;
+    LinkedList_Append(chain, reinterpret_cast<LLPayload_t>(kv_copy));
+    table->num_elements++;
+    return false;
+  }  // you may need to change this return value
 }
 
 bool HashTable_Find(HashTable* table,
@@ -124,8 +163,24 @@ bool HashTable_Find(HashTable* table,
                     HTKey_t key,
                     HTKeyValue_t* keyvalue) {
   // STEP 2: implement HashTable_Find.
+  const size_t bkt=HashKeyToBucketNum(table, hash);
+  LinkedList* chain=table->buckets[bkt];
 
-  return false;  // you may need to change this return value
+  LLIterator* iter=LLIterator_New(chain);
+  bool found=false;
+  while (LLIterator_IsValid(iter)) {
+    HTKeyValue_t* current_kv;
+    LLIterator_Get(iter, reinterpret_cast<LLPayload_t*>(&current_kv));
+    if (current_kv->hash==hash && table->key_cmp_fn(current_kv->key, key)) {
+      *keyvalue = *current_kv;
+      found = true;
+      break;
+    }
+    LLIterator_Next(iter);
+  }
+  LLIterator_Delete(iter);
+  return found;
+  // you may need to change this return value
 }
 
 bool HashTable_Remove(HashTable* table,
@@ -133,8 +188,25 @@ bool HashTable_Remove(HashTable* table,
                       HTKey_t key,
                       HTKeyValue_t* keyvalue) {
   // STEP 3: implement HashTable_Remove.
-
-  return false;  // you may need to change this return value
+   const size_t bkt=HashKeyToBucketNum(table, hash);
+  LinkedList* chain=table->buckets[bkt];
+  LLIterator* iter=LLIterator_New(chain);
+  bool found=false;
+  while (LLIterator_IsValid(iter)) {
+    HTKeyValue_t* curr_kv;
+    LLIterator_Get(iter, reinterpret_cast<LLPayload_t*>(&curr_kv));
+    if (curr_kv->hash==hash && table->key_cmp_fn(curr_kv->key, key)) {
+      found = true;
+      *keyvalue=*curr_kv;
+      LLIterator_Remove(iter, nullptr);
+      table->num_elements--;
+      break;
+    }
+    LLIterator_Next(iter);
+  }
+  LLIterator_Delete(iter);
+  return found;
+    // you may need to change this return value
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -178,20 +250,52 @@ void HTIterator_Delete(HTIterator* iter) {
 
 bool HTIterator_IsValid(HTIterator* iter) {
   // STEP 4: implement HTIterator_IsValid.
-
-  return true;  // you may need to change this return value
+  if (iter==nullptr) {
+    return false;
+  }
+  if (iter->bucket_it==nullptr) {
+    return false;
+  }
+  return LLIterator_IsValid(iter->bucket_it);
+  // you may need to change this return value
 }
 
 bool HTIterator_Next(HTIterator* iter) {
   // STEP 5: implement HTIterator_Next.
-
-  return true;  // you may need to change this return value
+ if (iter==nullptr) {
+    return false;
+  }
+  if (!HTIterator_IsValid(iter)) {
+    return false;
+  }
+  if (LLIterator_Next(iter->bucket_it)) {
+    return true;
+  }
+  
+  LLIterator_Delete(iter->bucket_it);
+  iter->bucket_it=nullptr;
+  for (size_t i=iter->bucket_idx+1;i<iter->ht->num_buckets;i++) {
+    if (LinkedList_NumElements(iter->ht->buckets[i])>0) {
+      iter->bucket_idx=i;
+      iter->bucket_it=LLIterator_New(iter->ht->buckets[i]);
+      return true;
+    }
+  }
+  iter->bucket_idx=k_invalid_index;
+  return false;
+  // you may need to change this return value
 }
 
 bool HTIterator_Get(HTIterator* iter, HTKeyValue_t* keyvalue) {
   // STEP 6: implement HTIterator_Get.
-
-  return true;  // you may need to change this return value
+  if (!HTIterator_IsValid(iter)) {
+    return false;
+  }
+  HTKeyValue_t* kv;
+  LLIterator_Get(iter->bucket_it,reinterpret_cast<LLPayload_t*>(&kv));
+  *keyvalue = *kv;
+  return true;
+   // you may need to change this return value
 }
 
 // Implemented for you
