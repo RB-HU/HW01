@@ -229,7 +229,7 @@ bool LLIterator_Remove(LLIterator* iter,
     }
     delete to_remove;
     list->num_elements--;
-    return list->head != nullptr;
+    return true;
     // you may need to change this return value
 }
 
