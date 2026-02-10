@@ -323,7 +323,7 @@ static void MaybeResize(HashTable *ht) {
   // iterate over the old hashtable, do the surgery on
   // the old hashtable record and deallocate the new hashtable
   // record.
-  HashTable *newht = HashTable_New(ht->num_bucket s * 9, ht->key_cmp_fn);
+  HashTable *newht = HashTable_New(ht->num_buckets * 9, ht->key_cmp_fn);
 
   // Loop through the old ht copying its elements over into the new one.
   HTIterator *it = HTIterator_New(ht);
