@@ -81,7 +81,7 @@ void HashTable_Delete(HashTable *table, KeyValueFreeFnPtr kv_free_function) {
     // value_free_function -- which takes a HTKeyValue_t, not an LLPayload_t --
     // to deallocate the caller's memory.
     while (LinkedList_NumElements(bucket) > 0) {
-      LinkedList_Pop(bucket, reinterpret_cast<LLPayload_ t *>(&kv));
+      LinkedList_Pop(bucket, reinterpret_cast<LLPayload_t *>(&kv));
       kv_free_function(*kv);
       delete kv;
     }
@@ -115,10 +115,10 @@ bool HashTable_Insert(HashTable *table, HTKeyValue_t newkeyvalue,
   // can be reused in steps 2 and 3.
   bool found = false;
   HTKeyValue_t *found_kv = nullptr;
-  LLIterato r *chain_iter = LLIterator_New(chain);
+  LLIterator *chain_iter = LLIterator_New(chain);
   while (LLIterator_IsValid(chain_iter)) {
     HTKeyValue_t *curr_kv;
-    LLIterator_Get(chain_iter, reinterpret_cast<LLPayload_ t *>(&curr_kv));
+    LLIterator_Get(chain_iter, reinterpret_cast<LLPayload_t *>(&curr_kv));
 
     if (curr_kv->hash == newkeyvalue.hash &&
         table->key_cmp_fn(curr_kv->key, newkeyvalue.key)) {
@@ -133,10 +133,10 @@ bool HashTable_Insert(HashTable *table, HTKeyValue_t newkeyvalue,
     *oldkeyvalue = *found_kv;
     HTKeyValue_t *kv_copy = new HTKeyValue_t;
     *kv_copy = newkeyvalue;
-    LLIterato r *replace_iter = LLIterator_New(chain);
+    LLIterator *replace_iter = LLIterator_New(chain);
     while (LLIterator_IsValid(replace_iter)) {
       HTKeyValue_t *curr_kv;
-      LLIterator_Get(replace_iter, reinterpret_cast<LLPayload_ t *>(&curr_kv));
+      LLIterator_Get(replace_iter, reinterpret_cast<LLPayload_t *>(&curr_kv));
       if (curr_kv == found_kv) {
         LLIterator_Remove(replace_iter, nullptr);
         LinkedList_Append(chain, reinterpret_cast<LLPayload_t>(kv_copy));
@@ -161,11 +161,11 @@ bool HashTable_Find(HashTable *table, HTHash_t hash, HTKey_t key,
   const size_t bkt = HashKeyToBucketNum(table, hash);
   LinkedList *chain = table->buckets[bkt];
 
-  LLIterato r *iter = LLIterator_New(chain);
+  LLIterator *iter = LLIterator_New(chain);
   bool found = false;
   while (LLIterator_IsValid(iter)) {
     HTKeyValue_t *current_kv;
-    LLIterator_Get(iter, reinterpret_cast<LLPayload_ t *>(&current_kv));
+    LLIterator_Get(iter, reinterpret_cast<LLPayload_t *>(&current_kv));
     if (current_kv->hash == hash && table->key_cmp_fn(current_kv->key, key)) {
       *keyvalue = *current_kv;
       found = true;
@@ -183,11 +183,11 @@ bool HashTable_Remove(HashTable *table, HTHash_t hash, HTKey_t key,
   // STEP 3: implement HashTable_Remove.
   const size_t bkt = HashKeyToBucketNum(table, hash);
   LinkedList *chain = table->buckets[bkt];
-  LLIterato r *iter = LLIterator_New(chain);
+  LLIterator *iter = LLIterator_New(chain);
   bool found = false;
   while (LLIterator_IsValid(iter)) {
     HTKeyValue_t *curr_kv;
-    LLIterator_Get(iter, reinterpret_cast<LLPayload_ t *>(&curr_kv));
+    LLIterator_Get(iter, reinterpret_cast<LLPayload_t *>(&curr_kv));
     if (curr_kv->hash == hash && table->key_cmp_fn(curr_kv->key, key)) {
       found = true;
       *keyvalue = *curr_kv;
@@ -285,7 +285,7 @@ bool HTIterator_Get(HTIterato r *iter, HTKeyValue_t *keyvalue) {
     return false;
   }
   HTKeyValue_t *kv;
-  LLIterator_Get(iter->bucket_it, reinterpret_cast<LLPayload_ t *>(&kv));
+  LLIterator_Get(iter->bucket_it, reinterpret_cast<LLPayload_t *>(&kv));
   *keyvalue = *kv;
   return true;
   // you may need to change this return value
