@@ -206,8 +206,8 @@ bool HashTable_Remove(HashTable *table, HTHash_t hash, HTKey_t key,
 // HTIterator implementation.
 
 // Implemented for you
-HTIterato r *HTIterator_New(HashTable *table) {
-  HTIterato r *iter = new HTIterator{};
+HTIterator *HTIterator_New(HashTable *table) {
+  HTIterator *iter = new HTIterator{};
 
   // If the hash table is empty, the iterator is immediately invalid,
   // since it can't point to anything.
@@ -233,7 +233,7 @@ HTIterato r *HTIterator_New(HashTable *table) {
 }
 
 // Implemented for you
-void HTIterator_Delete(HTIterato r *iter) {
+void HTIterator_Delete(HTIterator *iter) {
   if (iter->bucket_it != nullptr) {
     LLIterator_Delete(iter->bucket_it);
     iter->bucket_it = nullptr;
@@ -241,7 +241,7 @@ void HTIterator_Delete(HTIterato r *iter) {
   delete iter;
 }
 
-bool HTIterator_IsValid(HTIterato r *iter) {
+bool HTIterator_IsValid(HTIterator *iter) {
   // STEP 4: implement HTIterator_IsValid.
   if (iter == nullptr) {
     return false;
@@ -253,7 +253,7 @@ bool HTIterator_IsValid(HTIterato r *iter) {
   // you may need to change this return value
 }
 
-bool HTIterator_Next(HTIterato r *iter) {
+bool HTIterator_Next(HTIterator *iter) {
   // STEP 5: implement HTIterator_Next.
   if (iter == nullptr) {
     return false;
@@ -279,7 +279,7 @@ bool HTIterator_Next(HTIterato r *iter) {
   // you may need to change this return value
 }
 
-bool HTIterator_Get(HTIterato r *iter, HTKeyValue_t *keyvalue) {
+bool HTIterator_Get(HTIterator *iter, HTKeyValue_t *keyvalue) {
   // STEP 6: implement HTIterator_Get.
   if (!HTIterator_IsValid(iter)) {
     return false;
@@ -292,7 +292,7 @@ bool HTIterator_Get(HTIterato r *iter, HTKeyValue_t *keyvalue) {
 }
 
 // Implemented for you
-bool HTIterator_Remove(HTIterato r *iter, HTKeyValue_t *keyvalue) {
+bool HTIterator_Remove(HTIterator *iter, HTKeyValue_t *keyvalue) {
   HTKeyValue_t kv;
 
   // Try to get what the iterator is pointing to.
@@ -326,7 +326,7 @@ static void MaybeResize(HashTable *ht) {
   HashTable *newht = HashTable_New(ht->num_bucket s * 9, ht->key_cmp_fn);
 
   // Loop through the old ht copying its elements over into the new one.
-  HTIterato r *it = HTIterator_New(ht);
+  HTIterator *it = HTIterator_New(ht);
   for (; HTIterator_IsValid(it); HTIterator_Next(it)) {
     HTKeyValue_t item, unused;
 
