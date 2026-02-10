@@ -9,13 +9,13 @@
 LinkedList* LinkedList_New() {
  // TODO: allocate the LinkedList struct and initialize the newly allocated
  // record structure.
- LinkedList* list=new LinkedList;
+ LinkedList* list = new LinkedList;
  if (list == nullptr) {
  return nullptr;
  }
  list->num_elements= 0;
- list->head=nullptr;
- list->tail=nullptr;
+ list->head = nullptr;
+ list->tail = nullptr;
  return list;
 
  // you may want to change this
@@ -32,15 +32,15 @@ void LinkedList_Delete(LinkedList* list,
  return;
  }
  
- LinkedListNode* curr=list->head;
+ LinkedListNode* curr = list->head;
  while (curr != nullptr) {
- LinkedListNode* nxt=curr->next;
+ LinkedListNode* nxt = curr->next;
  
  if (payload_free_function != nullptr) {
   payload_free_function(curr->payload);
  }
  delete curr;
- curr=nxt;
+ curr = nxt;
  }
  
  delete list;
@@ -59,16 +59,16 @@ void LinkedList_Push(LinkedList* list, LLPayload_t payload) {
  if (new_node == nullptr) {
  return;
  }
- new_node->payload=payload;
- new_node->next=list->head;
- new_node->prev=nullptr;
+ new_node->payload = payload;
+ new_node->next = list->head;
+ new_node->prev = nullptr;
  if (list->head != nullptr) {
- list->head->prev=new_node;
+ list->head->prev = new_node;
  } 
  else {
- list->tail=new_node;
+ list->tail = new_node;
  }
- list->head=new_node;
+ list->head = new_node;
  list->num_elements++;
 
 }
@@ -83,15 +83,15 @@ bool LinkedList_Pop(LinkedList* list, LLPayload_t* payload_ptr) {
  if (list == nullptr || list->head == nullptr) {
  return false;
  }
- LinkedListNode* to_remove=list->head;
- *payload_ptr=to_remove->payload;
+ LinkedListNode* to_remove = list->head;
+ *payload_ptr = to_remove->payload;
  
- list->head=to_remove->next;
+ list->head = to_remove->next;
  if (list->head != nullptr) {
- list->head->prev=nullptr;
+ list->head->prev = nullptr;
  } 
  else {
- list->tail=nullptr;
+ list->tail = nullptr;
  }
  delete to_remove;
  list->num_elements--;
@@ -105,22 +105,22 @@ void LinkedList_Append(LinkedList* list, LLPayload_t payload) {
  if (list == nullptr) {
  return;
  }
- LinkedListNode* new_node=new LinkedListNode;
+ LinkedListNode* new_node = new LinkedListNode;
  if (new_node == nullptr) {
  return;
  }
- new_node->payload=payload;
- new_node->next=nullptr;
- new_node->prev=list->tail;
+ new_node->payload = payload;
+ new_node->next = nullptr;
+ new_node->prev = list->tail;
  
  if (list->tail != nullptr) {
- list->tail->next=new_node;
+ list->tail->next = new_node;
  } 
  else {
- list->head=new_node;
+ list->head = new_node;
  }
  
- list->tail=new_node;
+ list->tail = new_node;
  list->num_elements++;
 }
 
@@ -129,14 +129,14 @@ bool LinkedList_Slice(LinkedList* list, LLPayload_t* payload_ptr) {
 if (list == nullptr || list->tail == nullptr) {
  return false;
  }
- LinkedListNode* to_remove=list->tail;
- *payload_ptr=to_remove->payload;
- list->tail=to_remove->prev;
+ LinkedListNode* to_remove = list->tail;
+ *payload_ptr = to_remove->payload;
+ list->tail = to_remove->prev;
  if (list->tail != nullptr) {
- list->tail->next=nullptr;
+ list->tail->next = nullptr;
  } 
  else {
- list->head=nullptr;
+ list->head = nullptr;
  }
  delete to_remove;
  list->num_elements--;
@@ -151,12 +151,12 @@ LLIterator* LLIterator_New(LinkedList* list) {
  if (list == nullptr) {
  return nullptr;
  }
- LLIterator* iter=new LLIterator;
+ LLIterator* iter = new LLIterator;
  if (iter == nullptr) {
  return nullptr;
  }
- iter->list=list;
- iter->node=list->head;
+ iter->list = list;
+ iter->node = list->head;
  return iter; // you may want to change this
 }
 
@@ -179,7 +179,7 @@ bool LLIterator_Next(LLIterator* iter) {
  if (iter == nullptr || iter->node == nullptr){
  return false;
  }
- iter->node=iter->node->next;
+ iter->node = iter->node->next;
  return iter->node != nullptr; // you may need to change this return value
 }
 
@@ -188,7 +188,7 @@ void LLIterator_Get(LLIterator* iter, LLPayload_t* payload) {
  if (iter == nullptr || iter->node == nullptr){
  return;
  }
- *payload=iter->node->payload;
+ *payload = iter->node->payload;
 }
 
 bool LLIterator_Remove(LLIterator* iter,
@@ -208,24 +208,24 @@ bool LLIterator_Remove(LLIterator* iter,
  if (iter == nullptr || iter->node == nullptr){
  return false;
  }
- LinkedListNode* to_remove=iter->node;
- LinkedList* list=iter->list;
+ LinkedListNode* to_remove = iter->node;
+ LinkedList* list = iter->list;
  if (payload_free_function != nullptr) {
  payload_free_function(to_remove->payload);
  }
  if (to_remove->prev != nullptr) {
- to_remove->prev->next=to_remove->next;
+ to_remove->prev->next = to_remove->next;
  } 
  else {
- list->head=to_remove->next;
+ list->head = to_remove->next;
  }
  if (to_remove->next != nullptr) {
- to_remove->next->prev=to_remove->prev;
- iter->node=to_remove->next;
+ to_remove->next->prev = to_remove->prev;
+ iter->node = to_remove->next;
  } 
  else {
- list->tail=to_remove->prev;
- iter->node=nullptr;
+ list->tail = to_remove->prev;
+ iter->node = nullptr;
  }
  delete to_remove;
  list->num_elements--;
