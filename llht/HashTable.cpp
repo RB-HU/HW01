@@ -12,10 +12,10 @@ static constexpr size_t k_invalid_index = -1;
 
 // Grows the hashtable (ie, increase the number of buckets) if its load
 // factor has become too high.
-static void MaybeResize(HashTabl e *ht);
+static void MaybeResize(HashTable *ht);
 
 // Implemented for you
-static size_t HashKeyToBucketNum(HashTabl e *ht, HTHash_t hash) {
+static size_t HashKeyToBucketNum(HashTable *ht, HTHash_t hash) {
   return hash % ht->num_buckets;
 }
 
@@ -29,14 +29,14 @@ static void HTNoOpDelete(HTKeyValue_t delete_me) {}
 // HashTable implementation.
 
 // Implemented for you
-HTHash_t FNVHash64(unsigned cha r *buffer, int len) {
+HTHash_t FNVHash64(unsigned char *buffer, int len) {
   // This code is adapted from code by Landon Curt Noll
   // and Bonelli Nicola:
   //   http://code.google.com/p/nicola-bonelli-repo/
   static constexpr uint64_t FNV1_64_INIT = 0xcbf29ce484222325ULL;
   static constexpr uint64_t FNV_64_PRIME = 0x100000001b3ULL;
-  unsigned cha r *bp = buffer;
-  unsigned cha r *be = bp + len;
+  unsigned char *bp = buffer;
+  unsigned char *be = bp + len;
   uint64_t hval = FNV1_64_INIT;
 
   // FNV-1a hash each octet of the buffer.
@@ -44,16 +44,15 @@ HTHash_t FNVHash64(unsigned cha r *buffer, int len) {
     // XOR the bottom with the current octet.
     hval ^= static_cast<uint64_t>(*bp++);
     // Multiply by the 64 bit FNV magic prime mod 2^64.
-    hva l *= FNV_64_PRIME;
+    hval *= FNV_64_PRIME;
   }
   return hval;
 }
 
 // Implemented for you
-HashTabl e *HashTable_New(size_t num_buckets,
-                          KeyCmpFnPtr key_compare_function) {
+HashTable *HashTable_New(size_t num_buckets, KeyCmpFnPtr key_compare_function) {
   // Allocate the hash table record.
-  HashTabl e *ht = new HashTable{};
+  HashTable *ht = new HashTable{};
 
   // Initialize the record.
   ht->num_buckets = num_buckets;
@@ -69,7 +68,7 @@ HashTabl e *HashTable_New(size_t num_buckets,
 }
 
 // Implemented for you
-void HashTable_Delete(HashTabl e *table, KeyValueFreeFnPtr kv_free_function) {
+void HashTable_Delete(HashTable *table, KeyValueFreeFnPtr kv_free_function) {
   int i;
 
   // Free each bucket's chain.
@@ -98,9 +97,9 @@ void HashTable_Delete(HashTabl e *table, KeyValueFreeFnPtr kv_free_function) {
 }
 
 // Implemented for you
-size_t HashTable_NumElements(HashTabl e *table) { return table->num_elements; }
+size_t HashTable_NumElements(HashTable *table) { return table->num_elements; }
 
-bool HashTable_Insert(HashTabl e *table, HTKeyValue_t newkeyvalue,
+bool HashTable_Insert(HashTable *table, HTKeyValue_t newkeyvalue,
                       HTKeyValue_t *oldkeyvalue) {
   MaybeResize(table);
 
@@ -156,7 +155,7 @@ bool HashTable_Insert(HashTabl e *table, HTKeyValue_t newkeyvalue,
   } // you may need to change this return value
 }
 
-bool HashTable_Find(HashTabl e *table, HTHash_t hash, HTKey_t key,
+bool HashTable_Find(HashTable *table, HTHash_t hash, HTKey_t key,
                     HTKeyValue_t *keyvalue) {
   // STEP 2: implement HashTable_Find.
   const size_t bkt = HashKeyToBucketNum(table, hash);
@@ -179,7 +178,7 @@ bool HashTable_Find(HashTabl e *table, HTHash_t hash, HTKey_t key,
   // you may need to change this return value
 }
 
-bool HashTable_Remove(HashTabl e *table, HTHash_t hash, HTKey_t key,
+bool HashTable_Remove(HashTable *table, HTHash_t hash, HTKey_t key,
                       HTKeyValue_t *keyvalue) {
   // STEP 3: implement HashTable_Remove.
   const size_t bkt = HashKeyToBucketNum(table, hash);
@@ -207,7 +206,7 @@ bool HashTable_Remove(HashTabl e *table, HTHash_t hash, HTKey_t key,
 // HTIterator implementation.
 
 // Implemented for you
-HTIterato r *HTIterator_New(HashTabl e *table) {
+HTIterato r *HTIterator_New(HashTable *table) {
   HTIterato r *iter = new HTIterator{};
 
   // If the hash table is empty, the iterator is immediately invalid,
@@ -314,7 +313,7 @@ bool HTIterator_Remove(HTIterato r *iter, HTKeyValue_t *keyvalue) {
 }
 
 // Implemented for you
-static void MaybeResize(HashTabl e *ht) {
+static void MaybeResize(HashTable *ht) {
   // Resize if the load factor is > 3.
   if (ht->num_elements < 3 * ht->num_buckets) {
     return;
@@ -324,7 +323,7 @@ static void MaybeResize(HashTabl e *ht) {
   // iterate over the old hashtable, do the surgery on
   // the old hashtable record and deallocate the new hashtable
   // record.
-  HashTabl e *newht = HashTable_New(ht->num_bucket s * 9, ht->key_cmp_fn);
+  HashTable *newht = HashTable_New(ht->num_bucket s * 9, ht->key_cmp_fn);
 
   // Loop through the old ht copying its elements over into the new one.
   HTIterato r *it = HTIterator_New(ht);
