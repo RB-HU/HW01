@@ -223,13 +223,13 @@ bool LLIterator_Remove(LLIterator* iter,
     list->tail = to_remove->prev;
     iter->node = list->tail;
   }
-  delete to_remove;
   list->num_elements--;
   if (list->num_elements == 0) {
     list->head = nullptr;
     list->tail = nullptr;
     iter->node = nullptr;
   }
+  delete to_remove;
   return LLIterator_IsValid(iter);
   // you may need to change this return value
 }
