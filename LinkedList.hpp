@@ -1,8 +1,8 @@
 #ifndef LINKEDLIST_HPP_
 #define LINKEDLIST_HPP_
 
-#include <cstdint>  // for uint64_t, etc.
 #include <cstddef>  // for size_t
+#include <cstdint>  // for uint64_t, etc.
 
 ///////////////////////////////////////////////////////////////////////////////
 // A LinkedList is a doubly-linked list.
