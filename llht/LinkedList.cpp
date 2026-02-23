@@ -218,11 +218,16 @@ bool LLIterator_Remove(LLIterator* iter,
     iter->node = to_remove->next;
   } else {
     list->tail = to_remove->prev;
-    iter->node = nullptr;
+    iter->node = list->tail;
   }
   delete to_remove;
   list->num_elements--;
-  return list->head != nullptr;
+  if (list->num_elements == 0) {
+    list->head = nullptr;
+    list->tail = nullptr;
+    iter->node = nullptr;
+  }
+  return LLIterator_IsValid(iter);
   // you may need to change this return value
 }
 
